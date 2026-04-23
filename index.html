@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinTrack India — Smart Finance for Indians</title>
+  <meta name="description" content="All-in-one personal finance app for Indians — track expenses, predict future costs, calculate taxes, and forecast investments in Indian Rupees." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">₹</div>
+      <div class="brand-text">
+        <span class="brand-name">FinTrack</span>
+        <span class="brand-sub">India</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-tab="expenses" id="nav-expenses">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z"/></svg>
+        Expenses
+      </button>
+      <button class="nav-item" data-tab="prediction" id="nav-prediction">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Prediction
+      </button>
+      <button class="nav-item" data-tab="tax" id="nav-tax">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Tax Calculator
+      </button>
+      <button class="nav-item" data-tab="investment" id="nav-investment">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Investment
+      </button>
+      <button class="nav-item" data-tab="insights" id="nav-insights">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Smart Insights
+      </button>
+      <button class="nav-item" data-tab="subscriptions" id="nav-subscriptions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        Subscriptions
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="total-balance">
+        <p class="balance-label">Net Balance</p>
+        <p class="balance-amount" id="sidebar-balance">₹0</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div>
+          <h1 class="page-title" id="page-title">Dashboard</h1>
+          <p class="page-date" id="page-date"></p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-badge">FY 2025-26</div>
+        <div class="user-chip" id="user-chip">
+          <div class="user-avatar" id="user-avatar">U</div>
+          <span class="user-name" id="user-name">User</span>
+        </div>
+        <button class="logout-btn" id="logout-btn" title="Sign out">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD TAB -->
+    <section class="tab-content active" id="tab-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card income-card">
+          <div class="stat-icon">↑</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Income</p>
+            <p class="stat-value" id="dash-income">₹0</p>
+          </div>
+        </div>
+        <div class="stat-card expense-card">
+          <div class="stat-icon">↓</div>
+          <div class="stat-info">
+            <p class="stat-label">Total Expenses</p>
+            <p class="stat-value" id="dash-expense">₹0</p>
+          </div>
+        </div>
+        <div class="stat-card savings-card">
+          <div class="stat-icon">⊕</div>
+          <div class="stat-info">
+            <p class="stat-label">Net Savings</p>
+            <p class="stat-value" id="dash-savings">₹0</p>
+          </div>
+        </div>
+        <div class="stat-card tax-card">
+          <div class="stat-icon">§</div>
+          <div class="stat-info">
+            <p class="stat-label">Est. Tax Liability</p>
+            <p class="stat-value" id="dash-tax">₹0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indian UX: FY filter + number format toggle -->
+      <div class="india-toolbar" id="india-toolbar">
+        <div class="inda-group">
+          <span class="inda-label">🇮🇳 View</span>
+          <button class="inda-btn active" id="fy-btn" title="Fiscal Year: Apr 2025 – Mar 2026">FY 2025-26</button>
+          <button class="inda-btn" id="alltime-btn">All Time</button>
+        </div>
+        <div class="inda-group">
+          <span class="inda-label">Format</span>
+          <button class="inda-btn active" id="fmt-indian-btn" title="Indian: ₹1,00,000">₹1L / ₹1Cr</button>
+          <button class="inda-btn" id="fmt-full-btn" title="Full: ₹1,00,000">Full</button>
+        </div>
+        <div class="inda-festive" id="inda-festive" style="display:none"></div>
+      </div>
+
+      <!-- Smart Insights Strip -->
+      <div class="smart-insights-strip" id="smart-insights-strip">
+        <div class="si-header">
+          <span class="si-badge">✨ AI Insights</span>
+          <span class="si-sub">Personalized analysis based on your spending</span>
+        </div>
+        <div class="si-cards" id="si-cards">
+          <div class="si-card si-placeholder">
+            <div class="si-icon">📊</div>
+            <p>Add transactions to unlock hyper-personalized insights about your spending habits.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <h3>Monthly Expense Trend</h3>
+            <p class="chart-sub">Last 6 months spending</p>
+          </div>
+          <div class="chart-body">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Expense Breakdown</h3>
+            <p class="chart-sub">By category</p>
+          </div>
+          <div class="chart-body">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="recent-section">
+        <h3 class="section-title">Recent Transactions</h3>
+        <div class="transactions-list" id="dash-transactions">
+          <div class="empty-state">
+            <p>No transactions yet. Add expenses to get started!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPENSES TAB -->
+    <section class="tab-content" id="tab-expenses">
+      <div class="two-col">
+        <div class="form-card">
+          <h3 class="card-title">Add Transaction</h3>
+          <form id="expense-form" autocomplete="off">
+            <div class="form-group">
+              <label>Type</label>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn active" data-type="expense" id="type-expense">Expense</button>
+                <button type="button" class="toggle-btn" data-type="income" id="type-income">Income</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="exp-desc">Description</label>
+              <div class="desc-input-wrap">
+                <input type="text" id="exp-desc" placeholder="e.g., Swiggy order, Uber ride, Amazon" required autocomplete="off" />
+                <div class="ac-spinner" id="ac-spinner"></div>
+              </div>
+              <div class="ac-suggestion" id="ac-suggestion" style="display:none">
+                <span class="ac-pill" id="ac-pill"></span>
+                <span class="ac-source" id="ac-source"></span>
+                <button type="button" class="ac-accept" id="ac-accept">✓ Apply</button>
+                <button type="button" class="ac-dismiss" id="ac-dismiss">✕</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="exp-amount">Amount (₹)</label>
+              <input type="number" id="exp-amount" placeholder="Enter amount" min="1" required />
+            </div>
+            <div class="form-group">
+              <div class="category-label-row">
+                <label for="exp-category">Category</label>
+                <span class="cat-ai-badge" id="cat-ai-badge" style="display:none">🧠 Auto-set</span>
+              </div>
+              <select id="exp-category">
+                <option value="Food & Dining">🍕 Food & Dining</option>
+                <option value="Transport">🚗 Transport</option>
+                <option value="Shopping">🛍️ Shopping</option>
+                <option value="Entertainment">🎬 Entertainment</option>
+                <option value="Health">💊 Health</option>
+                <option value="Education">📚 Education</option>
+                <option value="Utilities">💡 Utilities</option>
+                <option value="Rent">🏠 Rent</option>
+                <option value="Salary">💼 Salary</option>
+                <option value="Freelance">💻 Freelance</option>
+                <option value="Investment">📈 Investment Return</option>
+                <option value="Other">📦 Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="exp-date">Date</label>
+              <input type="date" id="exp-date" required />
+            </div>
+            <button type="submit" class="btn-primary">Add Transaction</button>
+          </form>
+        </div>
+        <div class="list-card">
+          <div class="list-header">
+            <h3 class="card-title">All Transactions</h3>
+            <div class="filter-row">
+              <select id="filter-category">
+                <option value="all">All Categories</option>
+                <option value="Food & Dining">Food & Dining</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Health">Health</option>
+                <option value="Education">Education</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Rent">Rent</option>
+                <option value="Salary">Salary</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Investment">Investment Return</option>
+                <option value="Other">Other</option>
+              </select>
+              <select id="filter-type">
+                <option value="all">All Types</option>
+                <option value="expense">Expenses</option>
+                <option value="income">Income</option>
+              </select>
+            </div>
+          </div>
+          <div class="transactions-list" id="all-transactions">
+            <div class="empty-state"><p>No transactions yet.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREDICTION TAB -->
+    <section class="tab-content" id="tab-prediction">
+      <div class="prediction-grid">
+        <div class="form-card">
+          <h3 class="card-title">Predict Future Expenses</h3>
+          <p class="card-desc">Based on your spending patterns, we forecast future expenses using trend analysis.</p>
+          <div class="form-group">
+            <label for="pred-months">Predict for Next</label>
+            <select id="pred-months">
+              <option value="3">3 Months</option>
+              <option value="6" selected>6 Months</option>
+              <option value="12">12 Months</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="inflation-rate">Inflation Rate (%)</label>
+            <input type="number" id="inflation-rate" value="6.5" step="0.1" min="0" max="30" />
+          </div>
+          <div class="form-group">
+            <label for="salary-growth">Expected Income Growth (%)</label>
+            <input type="number" id="salary-growth" value="8" step="0.1" min="0" max="50" />
+          </div>
+          <button class="btn-primary" id="predict-btn">Generate Prediction</button>
+        </div>
+        <div class="prediction-results" id="pred-results">
+          <div class="pred-chart-card">
+            <h3>Expense Forecast</h3>
+            <canvas id="predChart"></canvas>
+          </div>
+          <div class="pred-summary" id="pred-summary">
+            <div class="empty-state"><p>Click "Generate Prediction" to see your forecast.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="insights-section">
+        <h3 class="section-title">Spending Insights</h3>
+        <div class="insights-grid" id="insights-grid">
+          <div class="insight-card">
+            <div class="insight-icon">📊</div>
+            <h4>Avg. Monthly Spend</h4>
+            <p class="insight-value" id="ins-avg-spend">₹0</p>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon">📈</div>
+            <h4>Highest Month</h4>
+            <p class="insight-value" id="ins-highest">₹0</p>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon">📉</div>
+            <h4>Lowest Month</h4>
+            <p class="insight-value" id="ins-lowest">₹0</p>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon">🎯</div>
+            <h4>Top Category</h4>
+            <p class="insight-value" id="ins-top-cat">N/A</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAX CALCULATOR TAB -->
+    <section class="tab-content" id="tab-tax">
+      <div class="tax-layout">
+        <div class="form-card tax-form-card">
+          <h3 class="card-title">Income Tax Calculator</h3>
+          <p class="card-desc">Calculate your income tax as per Indian IT Act (FY 2025-26 / AY 2026-27)</p>
+
+          <div class="form-group">
+            <label>Tax Regime</label>
+            <div class="toggle-group">
+              <button type="button" class="toggle-btn active" data-regime="new" id="regime-new">New Regime</button>
+              <button type="button" class="toggle-btn" data-regime="old" id="regime-old">Old Regime</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="tax-age">Age Group</label>
+            <select id="tax-age">
+              <option value="below60">Below 60 years</option>
+              <option value="60to80">60 - 80 years (Senior Citizen)</option>
+              <option value="above80">Above 80 years (Super Senior)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="gross-salary">Annual Gross Salary (₹)</label>
+            <input type="number" id="gross-salary" placeholder="e.g., 1200000" min="0" />
+          </div>
+          <div class="form-group">
+            <label for="other-income">Other Income (₹)</label>
+            <input type="number" id="other-income" placeholder="Rent, interest, etc." min="0" value="0" />
+          </div>
+          <div id="old-regime-deductions" style="display:none">
+            <hr class="divider" />
+            <h4 class="sub-heading">Deductions (Old Regime)</h4>
+            <div class="form-group">
+              <label for="ded-80c">80C (Max ₹1,50,000)</label>
+              <input type="number" id="ded-80c" placeholder="PPF, LIC, ELSS, etc." min="0" max="150000" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="ded-80d">80D Medical Insurance (Max ₹25,000)</label>
+              <input type="number" id="ded-80d" placeholder="Health insurance premiums" min="0" max="25000" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="ded-hra">HRA Exemption (₹)</label>
+              <input type="number" id="ded-hra" placeholder="House rent allowance" min="0" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="ded-home-loan">Home Loan Interest 24(b) (Max ₹2,00,000)</label>
+              <input type="number" id="ded-home-loan" placeholder="Home loan interest paid" min="0" max="200000" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="ded-nps">NPS 80CCD(1B) (Max ₹50,000)</label>
+              <input type="number" id="ded-nps" placeholder="NPS contribution" min="0" max="50000" value="0" />
+            </div>
+          </div>
+          <button class="btn-primary" id="calc-tax-btn">Calculate Tax</button>
+        </div>
+
+        <div class="tax-results-panel" id="tax-results">
+          <div class="tax-result-card">
+            <h3>Tax Summary</h3>
+            <div class="tax-breakdown" id="tax-breakdown">
+              <div class="empty-state"><p>Fill in your income details and click Calculate Tax.</p></div>
+            </div>
+          </div>
+          <div class="tax-chart-card">
+            <h3>Tax Breakdown</h3>
+            <canvas id="taxChart"></canvas>
+          </div>
+          <div class="slab-table-card" id="slab-table-card" style="display:none">
+            <h3>Applicable Tax Slabs</h3>
+            <div id="slab-table"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVESTMENT TAB -->
+    <section class="tab-content" id="tab-investment">
+      <div class="investment-tabs">
+        <button class="inv-tab active" data-inv="sip">SIP Calculator</button>
+        <button class="inv-tab" data-inv="fd">FD Calculator</button>
+        <button class="inv-tab" data-inv="ppf">PPF Calculator</button>
+        <button class="inv-tab" data-inv="goal">Goal Planner</button>
+      </div>
+
+      <!-- SIP -->
+      <div class="inv-content active" id="inv-sip">
+        <div class="two-col">
+          <div class="form-card">
+            <h3 class="card-title">SIP Investment Calculator</h3>
+            <p class="card-desc">Systematic Investment Plan — grow your wealth with mutual funds</p>
+            <div class="form-group">
+              <label for="sip-monthly">Monthly Investment (₹)</label>
+              <input type="number" id="sip-monthly" placeholder="e.g., 5000" value="5000" min="100" />
+            </div>
+            <div class="form-group">
+              <label for="sip-rate">Expected Annual Return (%)</label>
+              <input type="number" id="sip-rate" placeholder="e.g., 12" value="12" step="0.1" min="1" max="50" />
+            </div>
+            <div class="form-group">
+              <label for="sip-years">Investment Duration (Years)</label>
+              <input type="number" id="sip-years" placeholder="e.g., 10" value="10" min="1" max="40" />
+            </div>
+            <button class="btn-primary" id="calc-sip-btn">Calculate Returns</button>
+            <div class="result-display" id="sip-result" style="display:none">
+              <div class="result-row"><span>Total Invested</span><strong id="sip-invested">₹0</strong></div>
+              <div class="result-row"><span>Est. Returns</span><strong id="sip-returns" class="positive">₹0</strong></div>
+              <div class="result-row highlight"><span>Total Value</span><strong id="sip-total">₹0</strong></div>
+              <div class="result-row"><span>Wealth Gain</span><strong id="sip-gain" class="positive">0%</strong></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Growth Projection</h3>
+            <canvas id="sipChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- FD -->
+      <div class="inv-content" id="inv-fd">
+        <div class="two-col">
+          <div class="form-card">
+            <h3 class="card-title">Fixed Deposit Calculator</h3>
+            <p class="card-desc">Calculate FD maturity with quarterly compounding</p>
+            <div class="form-group">
+              <label for="fd-principal">Principal Amount (₹)</label>
+              <input type="number" id="fd-principal" placeholder="e.g., 100000" value="100000" min="1000" />
+            </div>
+            <div class="form-group">
+              <label for="fd-rate">Interest Rate (% p.a.)</label>
+              <input type="number" id="fd-rate" placeholder="e.g., 7.5" value="7.5" step="0.1" min="1" max="15" />
+            </div>
+            <div class="form-group">
+              <label for="fd-years">Duration (Years)</label>
+              <input type="number" id="fd-years" placeholder="e.g., 5" value="5" min="1" max="10" />
+            </div>
+            <div class="form-group">
+              <label for="fd-type">Account Type</label>
+              <select id="fd-type">
+                <option value="general">General Public</option>
+                <option value="senior">Senior Citizen (+0.5%)</option>
+              </select>
+            </div>
+            <button class="btn-primary" id="calc-fd-btn">Calculate FD</button>
+            <div class="result-display" id="fd-result" style="display:none">
+              <div class="result-row"><span>Principal</span><strong id="fd-prin-display">₹0</strong></div>
+              <div class="result-row"><span>Interest Earned</span><strong id="fd-interest" class="positive">₹0</strong></div>
+              <div class="result-row highlight"><span>Maturity Amount</span><strong id="fd-maturity">₹0</strong></div>
+              <div class="result-row"><span>Effective Yield</span><strong id="fd-yield" class="positive">0%</strong></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>FD Growth Over Time</h3>
+            <canvas id="fdChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- PPF -->
+      <div class="inv-content" id="inv-ppf">
+        <div class="two-col">
+          <div class="form-card">
+            <h3 class="card-title">PPF Calculator</h3>
+            <p class="card-desc">Public Provident Fund — safe, tax-free returns backed by government</p>
+            <div class="form-group">
+              <label for="ppf-annual">Annual Contribution (₹)</label>
+              <input type="number" id="ppf-annual" placeholder="Max ₹1,50,000" value="150000" min="500" max="150000" />
+            </div>
+            <div class="form-group">
+              <label for="ppf-rate">PPF Interest Rate (% p.a.)</label>
+              <input type="number" id="ppf-rate" value="7.1" step="0.1" min="1" max="15" />
+            </div>
+            <div class="form-group">
+              <label for="ppf-years">Duration (Years, min 15)</label>
+              <input type="number" id="ppf-years" value="15" min="15" max="50" />
+            </div>
+            <button class="btn-primary" id="calc-ppf-btn">Calculate PPF</button>
+            <div class="result-display" id="ppf-result" style="display:none">
+              <div class="result-row"><span>Total Invested</span><strong id="ppf-invested">₹0</strong></div>
+              <div class="result-row"><span>Interest Earned</span><strong id="ppf-interest" class="positive">₹0</strong></div>
+              <div class="result-row highlight"><span>Maturity Value</span><strong id="ppf-maturity">₹0</strong></div>
+              <div class="result-row"><span>Tax Saved (30% slab)</span><strong id="ppf-taxsaved" class="positive">₹0</strong></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>PPF Growth Year by Year</h3>
+            <canvas id="ppfChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOAL PLANNER -->
+      <div class="inv-content" id="inv-goal">
+        <div class="two-col">
+          <div class="form-card">
+            <h3 class="card-title">Financial Goal Planner</h3>
+            <p class="card-desc">Calculate how much you need to invest monthly to reach your financial goals</p>
+            <div class="form-group">
+              <label for="goal-name">Goal Name</label>
+              <input type="text" id="goal-name" placeholder="e.g., Buy a Car, House Down Payment" value="Dream Home Down Payment" />
+            </div>
+            <div class="form-group">
+              <label for="goal-amount">Target Amount (₹)</label>
+              <input type="number" id="goal-amount" placeholder="e.g., 5000000" value="5000000" min="1000" />
+            </div>
+            <div class="form-group">
+              <label for="goal-years">Time Horizon (Years)</label>
+              <input type="number" id="goal-years" placeholder="e.g., 10" value="10" min="1" max="40" />
+            </div>
+            <div class="form-group">
+              <label for="goal-rate">Expected Annual Return (%)</label>
+              <input type="number" id="goal-rate" placeholder="e.g., 12" value="12" step="0.1" min="1" max="50" />
+            </div>
+            <div class="form-group">
+              <label for="current-savings">Current Savings (₹)</label>
+              <input type="number" id="current-savings" placeholder="Already saved" value="0" min="0" />
+            </div>
+            <button class="btn-primary" id="calc-goal-btn">Plan My Goal</button>
+            <div class="result-display" id="goal-result" style="display:none">
+              <div class="result-row"><span>Monthly SIP Required</span><strong id="goal-sip" class="accent">₹0</strong></div>
+              <div class="result-row"><span>Total you'll invest</span><strong id="goal-total-invest">₹0</strong></div>
+              <div class="result-row highlight"><span>Projected Corpus</span><strong id="goal-corpus">₹0</strong></div>
+              <div class="result-row"><span>Returns Generated</span><strong id="goal-returns" class="positive">₹0</strong></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Goal Achievement Timeline</h3>
+            <canvas id="goalChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- SMART INSIGHTS FULL TAB -->
+    <section class="tab-content" id="tab-insights">
+      <div class="insights-tab-layout">
+        <!-- Future Balance Card -->
+        <div class="future-balance-card" id="future-balance-card">
+          <div class="fb-header">
+            <div>
+              <h3>Predicted Balance</h3>
+              <p class="fb-sub">Based on your current spending velocity</p>
+            </div>
+            <div class="fb-badge" id="fb-trend-badge">Calculating…</div>
+          </div>
+          <div class="fb-amounts">
+            <div class="fb-amount-block">
+              <p class="fb-label">In 1 Month</p>
+              <p class="fb-value" id="fb-1m">₹0</p>
+            </div>
+            <div class="fb-amount-block">
+              <p class="fb-label">In 3 Months</p>
+              <p class="fb-value" id="fb-3m">₹0</p>
+            </div>
+            <div class="fb-amount-block">
+              <p class="fb-label">In 6 Months</p>
+              <p class="fb-value" id="fb-6m">₹0</p>
+            </div>
+          </div>
+          <canvas id="futureBalanceChart" style="margin-top:20px;max-height:160px"></canvas>
+        </div>
+
+        <!-- Spending DNA -->
+        <div class="spending-dna-card" id="spending-dna-card">
+          <h3>Your Spending DNA 🧬</h3>
+          <p class="fb-sub">How your money flows each month</p>
+          <div class="dna-bars" id="dna-bars"></div>
+        </div>
+
+        <!-- Full Insights Grid -->
+        <div class="full-insights-grid" id="full-insights-grid">
+          <div class="si-card si-placeholder">
+            <div class="si-icon">🔍</div>
+            <p>Add at least 5 transactions to generate deep insights.</p>
+          </div>
+        </div>
+
+        <!-- Actionable Tips -->
+        <div class="action-tips-section">
+          <h3 class="section-title">💡 Actionable Tips</h3>
+          <div class="action-tips-grid" id="action-tips-grid">
+            <div class="si-card si-tip">
+              <div class="si-icon">🎯</div>
+              <div>
+                <h4>50-30-20 Rule</h4>
+                <p>Allocate 50% income to needs, 30% to wants, 20% to savings. This is the most proven budgeting framework.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBSCRIPTIONS TAB -->
+    <section class="tab-content" id="tab-subscriptions">
+      <!-- Summary bar -->
+      <div class="sub-summary-bar">
+        <div class="sub-stat">
+          <p class="sub-stat-label">Monthly Cost</p>
+          <p class="sub-stat-value" id="sub-monthly-total">₹0</p>
+        </div>
+        <div class="sub-stat">
+          <p class="sub-stat-label">Yearly Cost</p>
+          <p class="sub-stat-value" id="sub-yearly-total">₹0</p>
+        </div>
+        <div class="sub-stat">
+          <p class="sub-stat-label">Active</p>
+          <p class="sub-stat-value" id="sub-active-count">0</p>
+        </div>
+        <div class="sub-stat">
+          <p class="sub-stat-label">Next Renewal</p>
+          <p class="sub-stat-value" id="sub-next-renewal">—</p>
+        </div>
+        <button class="btn-detect-subs" id="btn-detect-subs">🔍 Auto-detect recurring</button>
+      </div>
+
+      <div class="sub-layout">
+        <!-- Add form -->
+        <div class="form-card sub-add-card">
+          <h3 class="card-title">➕ Add Subscription</h3>
+          <form id="sub-form" autocomplete="off">
+            <div class="form-group">
+              <label for="sub-emoji">Icon</label>
+              <div class="emoji-picker-row" id="emoji-picker-row">
+                <button type="button" class="emoji-opt active" data-emoji="📱">📱</button>
+                <button type="button" class="emoji-opt" data-emoji="🎬">🎬</button>
+                <button type="button" class="emoji-opt" data-emoji="🎵">🎵</button>
+                <button type="button" class="emoji-opt" data-emoji="💻">💻</button>
+                <button type="button" class="emoji-opt" data-emoji="🎮">🎮</button>
+                <button type="button" class="emoji-opt" data-emoji="📦">📦</button>
+                <button type="button" class="emoji-opt" data-emoji="☁️">☁️</button>
+                <button type="button" class="emoji-opt" data-emoji="📡">📡</button>
+              </div>
+              <input type="hidden" id="sub-emoji-val" value="📱" />
+            </div>
+            <div class="form-group">
+              <label for="sub-name">Service Name</label>
+              <input type="text" id="sub-name" placeholder="e.g., Netflix, Spotify, Jio" required />
+            </div>
+            <div class="form-group">
+              <label for="sub-amount">Amount (₹)</label>
+              <input type="number" id="sub-amount" placeholder="e.g., 499" min="1" required />
+            </div>
+            <div class="form-group">
+              <label for="sub-cycle">Billing Cycle</label>
+              <select id="sub-cycle">
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly (every 3 months)</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="sub-cat">Category</label>
+              <select id="sub-cat">
+                <option value="Entertainment">🎬 Entertainment</option>
+                <option value="Utilities">💡 Utilities</option>
+                <option value="Education">📚 Education</option>
+                <option value="Health">💨 Health</option>
+                <option value="Shopping">🛍️ Shopping</option>
+                <option value="Other">📦 Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="sub-next">Next Billing Date</label>
+              <input type="date" id="sub-next" />
+            </div>
+            <button type="submit" class="btn-primary">Add Subscription</button>
+          </form>
+        </div>
+
+        <!-- Cards area -->
+        <div class="sub-cards-area">
+          <div class="sub-cards-header">
+            <h3 class="section-title">Your Subscriptions</h3>
+            <div class="sub-filter-tabs">
+              <button class="sub-ftab active" data-filter="all">All</button>
+              <button class="sub-ftab" data-filter="active">Active</button>
+              <button class="sub-ftab" data-filter="paused">Paused</button>
+            </div>
+          </div>
+          <div class="sub-cards" id="sub-cards">
+            <div class="empty-state"><p>No subscriptions yet. Add one or auto-detect from your transactions!</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-detect suggestions panel (hidden by default) -->
+      <div class="detect-panel" id="detect-panel" style="display:none">
+        <div class="detect-header">
+          <h3>🔍 Detected Recurring Payments</h3>
+          <button class="detect-close" id="detect-close">×</button>
+        </div>
+        <p class="detect-sub">These transactions appear regularly. Click any to add as a subscription.</p>
+        <div id="detect-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- AI Chat Widget -->
+  <div class="ai-fab" id="ai-fab" title="Ask FinTrack AI">
+    <span class="ai-fab-icon">🤖</span>
+    <span class="ai-fab-label">Ask AI</span>
+  </div>
+
+  <div class="ai-panel" id="ai-panel">
+    <div class="ai-panel-header">
+      <div class="ai-header-left">
+        <div class="ai-avatar">🤖</div>
+        <div>
+          <div class="ai-name">FinTrack AI</div>
+          <div class="ai-status">● Online • Powered by your data</div>
+        </div>
+      </div>
+      <button class="ai-close" id="ai-close">×</button>
+    </div>
+    <div class="ai-messages" id="ai-messages">
+      <div class="ai-msg ai-msg-bot">
+        <div class="ai-bubble">
+          👋 Namaste! I'm your personal finance AI. Ask me anything about your spending, savings, or get advice.<br><br>
+          <strong>Try asking:</strong>
+        </div>
+        <div class="ai-chips" id="ai-chips">
+          <button class="ai-chip" data-q="How much did I spend this month?">This month's spend</button>
+          <button class="ai-chip" data-q="What is my savings rate?">My savings rate</button>
+          <button class="ai-chip" data-q="What is my top expense category?">Top expense</button>
+          <button class="ai-chip" data-q="Am I overspending on food?">Food check</button>
+          <button class="ai-chip" data-q="Compare this month to last month">Month comparison</button>
+          <button class="ai-chip" data-q="How much did I earn this month?">Income this month</button>
+          <button class="ai-chip" data-q="Give me a financial tip">Financial tip</button>
+        </div>
+      </div>
+    </div>
+    <div class="ai-input-row">
+      <input type="text" id="ai-input" placeholder="Ask about your finances…" autocomplete="off" />
+      <button class="ai-send" id="ai-send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast notifications -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
