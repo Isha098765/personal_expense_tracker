@@ -409,6 +409,24 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ===== FIELD ERROR ===== */
+    .field-error {
+      font-size: 0.75rem;
+      color: var(--danger);
+      margin-top: 5px;
+      display: none;
+      animation: alertIn 0.2s ease;
+    }
+    .field-error.show { display: block; }
+    .form-group input.invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+    }
+    .form-group input.valid {
+      border-color: var(--accent3);
+      box-shadow: 0 0 0 3px rgba(5,150,105,0.1);
+    }
+
     /* ===== STRENGTH METER ===== */
     .strength-bar {
       height: 3px; border-radius: 2px;
@@ -424,6 +442,42 @@
       font-size: 0.72rem; color: var(--text-muted);
       margin-top: 5px;
     }
+
+    /* ===== PASSWORD CHECKLIST ===== */
+    .pw-checklist {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 10px;
+      display: none;
+    }
+    .pw-checklist.visible { display: grid; }
+    .pw-rule {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 5px;
+      transition: color 0.2s ease;
+    }
+    .pw-rule .rule-icon { font-size: 0.8rem; transition: all 0.2s ease; }
+    .pw-rule.met { color: var(--accent3); }
+    .pw-rule.unmet { color: var(--danger); }
+
+    /* ===== CAPS LOCK WARNING ===== */
+    .caps-warn {
+      font-size: 0.74rem; color: #d97706;
+      margin-top: 5px; display: none;
+      align-items: center; gap: 5px;
+    }
+    .caps-warn.show { display: flex; }
+
+    /* ===== CONFIRM MATCH HINT ===== */
+    .match-hint {
+      font-size: 0.74rem; margin-top: 5px;
+      display: none; align-items: center; gap: 5px;
+    }
+    .match-hint.show { display: flex; }
+    .match-hint.ok { color: var(--accent3); }
+    .match-hint.bad { color: var(--danger); }
 
     /* ===== SCROLLBAR ===== */
     ::-webkit-scrollbar { width: 6px; }
@@ -529,6 +583,7 @@
               <span class="input-icon">✉</span>
               <input type="email" id="login-email" name="email" placeholder="you@example.com" required autocomplete="email" />
             </div>
+            <div class="field-error" id="err-login-email">Please enter a valid email address.</div>
           </div>
 
           <div class="form-group">
@@ -581,6 +636,7 @@
                 <span class="input-icon">👤</span>
                 <input type="text" id="signup-firstname" name="firstname" placeholder="Rahul" required autocomplete="given-name" />
               </div>
+              <div class="field-error" id="err-firstname">Only letters, spaces, hyphens or apostrophes (2–50 chars).</div>
             </div>
             <div class="form-group">
               <label for="signup-lastname">Last name</label>
@@ -588,6 +644,7 @@
                 <span class="input-icon">👤</span>
                 <input type="text" id="signup-lastname" name="lastname" placeholder="Sharma" required autocomplete="family-name" />
               </div>
+              <div class="field-error" id="err-lastname">Only letters, spaces, hyphens or apostrophes (2–50 chars).</div>
             </div>
           </div>
 
@@ -597,6 +654,7 @@
               <span class="input-icon">✉</span>
               <input type="email" id="signup-email" name="email" placeholder="you@example.com" required autocomplete="email" />
             </div>
+            <div class="field-error" id="err-signup-email">Please enter a valid email address (e.g. you@example.com).</div>
           </div>
 
           <div class="form-group">
@@ -608,6 +666,13 @@
             </div>
             <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
             <div class="strength-text" id="strength-text"></div>
+            <div class="caps-warn" id="caps-warn-pw">⚠️ Caps Lock is on</div>
+            <div class="pw-checklist" id="pw-checklist">
+              <span class="pw-rule" id="rule-len"><span class="rule-icon">○</span> 8+ characters</span>
+              <span class="pw-rule" id="rule-upper"><span class="rule-icon">○</span> Uppercase letter</span>
+              <span class="pw-rule" id="rule-num"><span class="rule-icon">○</span> Number</span>
+              <span class="pw-rule" id="rule-sym"><span class="rule-icon">○</span> Special character</span>
+            </div>
           </div>
 
           <div class="form-group">
@@ -615,7 +680,10 @@
             <div class="input-wrapper">
               <span class="input-icon">🔑</span>
               <input type="password" id="signup-confirm" name="confirm" placeholder="Re-enter your password" required autocomplete="new-password" />
+              <button type="button" class="input-toggle-pw" id="toggle-confirm-pw" aria-label="Toggle confirm password visibility">👁</button>
             </div>
+            <div class="caps-warn" id="caps-warn-confirm">⚠️ Caps Lock is on</div>
+            <div class="match-hint" id="match-hint"></div>
           </div>
 
           <button type="submit" class="btn-auth" id="signup-btn">
@@ -664,6 +732,16 @@
     document.getElementById('go-signup').addEventListener('click', (e) => { e.preventDefault(); showTab('signup'); });
     document.getElementById('go-login').addEventListener('click', (e) => { e.preventDefault(); showTab('login'); });
 
+    // Auto-focus first field on tab switch
+    function autoFocus(tab) {
+      const id = tab === 'login' ? 'login-email' : 'signup-firstname';
+      setTimeout(() => document.getElementById(id).focus(), 50);
+    }
+    loginTab.addEventListener('click', () => autoFocus('login'));
+    signupTab.addEventListener('click', () => autoFocus('signup'));
+    document.getElementById('go-signup').addEventListener('click', () => autoFocus('signup'));
+    document.getElementById('go-login').addEventListener('click', () => autoFocus('login'));
+
     // ===== PASSWORD TOGGLE =====
     function togglePw(inputId, btn) {
       const input = document.getElementById(inputId);
@@ -682,12 +760,31 @@
     document.getElementById('toggle-signup-pw').addEventListener('click', function() {
       togglePw('signup-password', this);
     });
+    document.getElementById('toggle-confirm-pw').addEventListener('click', function() {
+      togglePw('signup-confirm', this);
+    });
 
-    // ===== PASSWORD STRENGTH =====
+    // ===== PASSWORD STRENGTH + CHECKLIST =====
+    function updatePwChecklist(pw) {
+      const rules = [
+        { id: 'rule-len',   ok: pw.length >= 8 },
+        { id: 'rule-upper', ok: /[A-Z]/.test(pw) },
+        { id: 'rule-num',   ok: /[0-9]/.test(pw) },
+        { id: 'rule-sym',   ok: /[^A-Za-z0-9]/.test(pw) },
+      ];
+      rules.forEach(r => {
+        const el = document.getElementById(r.id);
+        el.classList.toggle('met', r.ok);
+        el.classList.toggle('unmet', !r.ok && pw.length > 0);
+        el.querySelector('.rule-icon').textContent = r.ok ? '✓' : (pw.length > 0 ? '✗' : '○');
+      });
+    }
+
     document.getElementById('signup-password').addEventListener('input', function() {
       const pw = this.value;
       const fill = document.getElementById('strength-fill');
       const text = document.getElementById('strength-text');
+      const checklist = document.getElementById('pw-checklist');
       let score = 0;
       if (pw.length >= 8) score++;
       if (/[A-Z]/.test(pw)) score++;
@@ -706,7 +803,39 @@
       fill.style.background = lvl.color;
       text.textContent = lvl.label;
       text.style.color = lvl.color;
+      checklist.classList.toggle('visible', pw.length > 0);
+      updatePwChecklist(pw);
+      // update confirm match hint live
+      updateMatchHint();
     });
+
+    // ===== CONFIRM MATCH HINT =====
+    function updateMatchHint() {
+      const pw  = document.getElementById('signup-password').value;
+      const cf  = document.getElementById('signup-confirm').value;
+      const hint = document.getElementById('match-hint');
+      if (!cf) { hint.classList.remove('show','ok','bad'); return; }
+      const match = pw === cf;
+      hint.classList.add('show');
+      hint.classList.toggle('ok', match);
+      hint.classList.toggle('bad', !match);
+      hint.textContent = match ? '✓ Passwords match' : '✗ Passwords do not match';
+    }
+    document.getElementById('signup-confirm').addEventListener('input', updateMatchHint);
+
+    // ===== CAPS LOCK DETECTION =====
+    function setupCapsWarn(inputId, warnId) {
+      const inp  = document.getElementById(inputId);
+      const warn = document.getElementById(warnId);
+      ['keydown','keyup'].forEach(evt => {
+        inp.addEventListener(evt, e => {
+          warn.classList.toggle('show', e.getModifierState && e.getModifierState('CapsLock'));
+        });
+      });
+      inp.addEventListener('blur', () => warn.classList.remove('show'));
+    }
+    setupCapsWarn('signup-password', 'caps-warn-pw');
+    setupCapsWarn('signup-confirm',  'caps-warn-confirm');
 
     // ===== ALERTS =====
     function showAlert(id, message, type) {
@@ -735,6 +864,53 @@
         : (btnId === 'login-btn' ? 'Sign In' : 'Create Account');
     }
 
+    // ===== VALIDATION HELPERS =====
+    const NAME_RE   = /^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ\s'\-]{1,49}$/;
+    const EMAIL_RE  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    function setFieldState(inputId, errId, valid) {
+      const inp = document.getElementById(inputId);
+      const err = document.getElementById(errId);
+      if (!inp) return valid;
+      inp.classList.toggle('invalid', !valid);
+      inp.classList.toggle('valid', valid);
+      if (err) err.classList.toggle('show', !valid);
+      return valid;
+    }
+
+    function validateName(inputId, errId) {
+      const val = document.getElementById(inputId).value.trim();
+      return setFieldState(inputId, errId, val.length >= 2 && NAME_RE.test(val));
+    }
+
+    function validateEmail(inputId, errId) {
+      const val = document.getElementById(inputId).value.trim();
+      return setFieldState(inputId, errId, EMAIL_RE.test(val));
+    }
+
+    // Real-time blur validation — signup
+    ['signup-firstname', 'signup-lastname'].forEach(id => {
+      document.getElementById(id).addEventListener('blur', () =>
+        validateName(id, 'err-' + id.replace('signup-', ''))
+      );
+      document.getElementById(id).addEventListener('input', () => {
+        const inp = document.getElementById(id);
+        if (inp.classList.contains('invalid')) validateName(id, 'err-' + id.replace('signup-', ''));
+      });
+    });
+    document.getElementById('signup-email').addEventListener('blur', () => validateEmail('signup-email', 'err-signup-email'));
+    document.getElementById('signup-email').addEventListener('input', () => {
+      if (document.getElementById('signup-email').classList.contains('invalid'))
+        validateEmail('signup-email', 'err-signup-email');
+    });
+
+    // Real-time blur validation — login email
+    document.getElementById('login-email').addEventListener('blur', () => validateEmail('login-email', 'err-login-email'));
+    document.getElementById('login-email').addEventListener('input', () => {
+      if (document.getElementById('login-email').classList.contains('invalid'))
+        validateEmail('login-email', 'err-login-email');
+    });
+
     // ===== LOGIN =====
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -743,8 +919,15 @@
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
 
-      if (!email || !password) {
-        showAlert('login-error', 'Please fill in all fields.', 'error');
+      const emailOk = validateEmail('login-email', 'err-login-email');
+      if (!emailOk) {
+        document.getElementById('login-email').focus();
+        showAlert('login-error', 'Please enter a valid email address.', 'error');
+        return;
+      }
+      if (!password) {
+        document.getElementById('login-password').focus();
+        showAlert('login-error', 'Please enter your password.', 'error');
         return;
       }
 
@@ -775,13 +958,25 @@
       hideAlerts('signup');
 
       const firstname = document.getElementById('signup-firstname').value.trim();
-      const lastname = document.getElementById('signup-lastname').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const password = document.getElementById('signup-password').value;
-      const confirm = document.getElementById('signup-confirm').value;
+      const lastname  = document.getElementById('signup-lastname').value.trim();
+      const email     = document.getElementById('signup-email').value.trim();
+      const password  = document.getElementById('signup-password').value;
+      const confirm   = document.getElementById('signup-confirm').value;
 
-      if (!firstname || !lastname || !email || !password || !confirm) {
-        showAlert('signup-error', 'Please fill in all fields.', 'error');
+      const fnOk  = validateName('signup-firstname', 'err-firstname');
+      const lnOk  = validateName('signup-lastname',  'err-lastname');
+      const emOk  = validateEmail('signup-email',    'err-signup-email');
+
+      if (!fnOk || !lnOk || !emOk) {
+        // scroll to first invalid field
+        const firstInvalid = document.querySelector('#signup-form .invalid');
+        if (firstInvalid) firstInvalid.focus();
+        showAlert('signup-error', 'Please fix the highlighted fields.', 'error');
+        return;
+      }
+      if (!password) {
+        document.getElementById('signup-password').focus();
+        showAlert('signup-error', 'Please enter a password.', 'error');
         return;
       }
       if (password.length < 6) {
